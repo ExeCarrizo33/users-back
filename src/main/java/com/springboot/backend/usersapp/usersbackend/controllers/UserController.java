@@ -2,11 +2,15 @@ package com.springboot.backend.usersapp.usersbackend.controllers;
 
 import com.springboot.backend.usersapp.usersbackend.models.User;
 import com.springboot.backend.usersapp.usersbackend.services.impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,12 +35,20 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<User> create(@RequestBody User user) {
+    public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return validation(result);
+        }
         return ResponseEntity.ok(userService.save(user));
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody User user, BindingResult result) {
+        if (result.hasErrors()) {
+            return validation(result);
+        }
+
         Optional<User> userList = userService.findById(id);
         if (userList.isPresent()) {
             User userDB = userList.get();
@@ -58,5 +70,12 @@ public class UserController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+
+    private static ResponseEntity<?> validation(BindingResult result) {
+        Map<String, String> errors = new HashMap<>();
+        result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(errors);
     }
 }
