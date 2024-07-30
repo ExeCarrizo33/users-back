@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -20,7 +21,7 @@ public class UserController {
     @Autowired
     private UserServiceImpl userService;
 
-    @GetMapping("/all")
+    @GetMapping
     public List<User> getAllUsers() {
         return userService.findAll();
     }
@@ -75,7 +76,7 @@ public class UserController {
 
     private static ResponseEntity<?> validation(BindingResult result) {
         Map<String, String> errors = new HashMap<>();
-        result.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+        result.getFieldErrors().forEach(error -> errors.put(error.getField(),"El campo " + error.getField() + " "+ error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
     }
 }
