@@ -1,6 +1,7 @@
 package com.springboot.backend.usersapp.usersbackend.services;
 
 import com.springboot.backend.usersapp.usersbackend.models.User;
+import com.springboot.backend.usersapp.usersbackend.models.dto.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +18,7 @@ public interface IUserService {
 
     User save(User user);
 
-
+    Optional<User> update(UserDto user, Long id);
 
     void deleteById(Long id);
 }

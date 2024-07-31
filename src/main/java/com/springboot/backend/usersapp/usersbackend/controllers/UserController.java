@@ -1,6 +1,7 @@
 package com.springboot.backend.usersapp.usersbackend.controllers;
 
 import com.springboot.backend.usersapp.usersbackend.models.User;
+import com.springboot.backend.usersapp.usersbackend.models.dto.UserDto;
 import com.springboot.backend.usersapp.usersbackend.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,7 @@ public class UserController {
 
     @Autowired
     private UserServiceImpl userService;
+
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -54,20 +57,14 @@ public class UserController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody User user, BindingResult result) {
+    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody UserDto user, BindingResult result) {
         if (result.hasErrors()) {
             return validation(result);
         }
 
-        Optional<User> userList = userService.findById(id);
+        Optional<User> userList = userService.update(user,id);
         if (userList.isPresent()) {
-            User userDB = userList.get();
-            userDB.setName(user.getName());
-            userDB.setLastname(user.getLastname());
-            userDB.setEmail(user.getEmail());
-            userDB.setUsername(user.getUsername());
-            userDB.setPassword(user.getPassword());
-            return ResponseEntity.ok(userService.save(userDB));
+            return ResponseEntity.ok(userList.orElseThrow());
         }
         return ResponseEntity.notFound().build();
     }
